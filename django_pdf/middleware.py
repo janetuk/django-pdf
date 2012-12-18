@@ -15,12 +15,10 @@ TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK', 'DJANGO_PDF_OUTPUT'
 
 def fetch_resources(uri, rel):
     """
-    Prepares paths for pisa, only includes local print.css files
+    Prepares paths for pisa
     """
-    path = ''
-    if 'http' not in uri and 'print.css' in uri:
-        path = os.path.join(settings.STATIC_ROOT,
-                uri.replace(settings.STATIC_URL, ""))
+    path = os.path.join(settings.STATIC_ROOT,
+            uri.replace(settings.STATIC_URL, ""))
     return path
 
 
