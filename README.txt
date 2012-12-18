@@ -4,19 +4,16 @@ What is this?
 ``django-pdf`` despite its simplicity has the pompous mission of automagically
 converting on-the-fly views' HTML output to PDF --without modifying your views.
 
-Requirements
+Installation
 ------------
 
-django-pdf depends on pisa:
-http://www.xhtml2pdf.com/doc/pisa-en.html
+There are 5 steps to setting it up with your projects.
 
+1. Install egg (via pip http://www.pip-installer.org/)
 
-How to use django-pdf
-----------------------------
+       pip install -e git+https://github.com/chrispbailey/django-pdf#egg=django-pdf
 
-There are really 4 steps to setting it up with your projects.
-
-1. List this application in the ``INSTALLED_APPS`` portion of your settings
+2. List this application in the ``INSTALLED_APPS`` portion of your settings
    file.  Your settings file might look something like::
    
        INSTALLED_APPS = (
@@ -24,7 +21,7 @@ There are really 4 steps to setting it up with your projects.
            'django_pdf',
        )
 
-2. Install the pdf middleware. Your settings file might look something
+3. Install the pdf middleware. Your settings file might look something
    like::
    
        MIDDLEWARE_CLASSES = (
@@ -32,7 +29,7 @@ There are really 4 steps to setting it up with your projects.
            'django_pdf.middleware.PdfMiddleware',
        )
 
-3. If it's not already added in your setup, add the request context processor.
+4. If it's not already added in your setup, add the request context processor.
    Note that context processors are set by default implicitly, so to set them
    explicitly, you need to copy and paste this code into your under
    the value TEMPLATE_CONTEXT_PROCESSORS::
@@ -43,7 +40,7 @@ There are really 4 steps to setting it up with your projects.
         "django.core.context_processors.media",
         "django.core.context_processors.request")
 
-4. Add the django_pdf's context processor
+5. Add the django_pdf's context processor
 
     TEMPLATE_CONTEXT_PROCESSORS=(
         "django.core.context_processors.auth",
@@ -96,9 +93,6 @@ Look:
 
 REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
 REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
-TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK',
-'DJANGO_PDF_OUTPUT')
+TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK','DJANGO_PDF_OUTPUT')
 
 That's it!  
-
-# TODO: Write better doc.

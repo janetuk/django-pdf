@@ -8,4 +8,5 @@ django_pdf/middleware.py
 django_pdf.egg-info/PKG-INFO
 django_pdf.egg-info/SOURCES.txt
 django_pdf.egg-info/dependency_links.txt
+django_pdf.egg-info/requires.txt
 django_pdf.egg-info/top_level.txt
