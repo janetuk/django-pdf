@@ -59,7 +59,10 @@ Example:
     http://127.0.0.1/contacts/list?format=pdf returns the pdf version of it.
 
 
-You may ask: "Wait! what if I don't want to include some parts of the HTML page
+Templates
+---------
+
+You may ask: "What if I don't want to include some parts of the HTML page
 in the PDF output? (like a menu)" 
 You'd be right, and the answer is easy:
 Use the variable DJANGO_PDF_OUTPUT in your template which will be set to True if
@@ -79,10 +82,11 @@ PDF output.
 
 
 Bonus:
--------
+------
 
-You have a new template tag {{ pdf_link }} which will generate a link to the PDF
-version of the current page. :)
+If you load the pdf_tags file into your template code (with {% load pdf_tags %}) 
+you will have access to a new template tag {% pdf_url %} which will generate a url
+to the PDF version of the current page. :)
 
 P.S.
 
@@ -95,4 +99,4 @@ REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
 REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
 TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK','DJANGO_PDF_OUTPUT')
 
-That's it!  
+That's it!
