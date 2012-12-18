@@ -2,8 +2,7 @@ from django.conf import settings
 
 REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
 REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
-TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK',
-'DJANGO_PDF_OUTPUT')
+TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK', 'DJANGO_PDF_OUTPUT')
 
 
 def check_format(request):
