@@ -17,6 +17,9 @@ def fetch_resources(uri, rel):
     """
     Prepares paths for pisa
     """
+    if uri.startswith('http'):
+        return uri
+
     path = os.path.join(settings.STATIC_ROOT,
             uri.replace(settings.STATIC_URL, ""))
     return path
