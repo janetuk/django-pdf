@@ -1,9 +1,11 @@
-// html2pdf.js
-// Taken from http://we-love-php.blogspot.co.uk/2012/12/create-pdf-invoices-with-html5-and-phantomjs.html
-
-var page = new WebPage();
-
-var system = require("system");
+/*
+ * html2pdf.js
+ * Originally taken from:
+ * http://we-love-php.blogspot.co.uk/2012/12/create-pdf-invoices-with-html5-and-phantomjs.html
+ */
+var page    = require('webpage').create();
+var fs      = require("fs");
+var system  = require("system");
 
 // change the paper size to letter, add some borders
 // add a footer callback showing page numbers
@@ -22,9 +24,12 @@ page.paperSize = {
 
 page.zoomFactor = 1.5;
 
-// assume the file is local, so we don't handle status errors
-page.open(system.args[1], function (status) {
-  // export to target (can be PNG, JPG or PDF!)
-  page.render(system.args[2]);
-  phantom.exit();
-});
+// read contents of page from STDIN
+var html = fs.read("/dev/stdin");
+
+page.content = html;
+
+page.render(system.args[1]);
+
+phantom.exit();
+

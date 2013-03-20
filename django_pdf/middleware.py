@@ -5,7 +5,8 @@ from django import http
 from django.http import HttpResponse
 from django.conf import settings
 
-import subprocess
+from StringIO import StringIO
+from subprocess import Popen, PIPE
 import os
 
 REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
@@ -24,18 +25,29 @@ def fetch_resources(uri, rel):
     return path
 
 
-def transform_to_pdf(response, url):
+def transform_to_pdf(response, name):
+    
+    # trick phantom into sending the pdf to STDOUT
     output_file = settings.APP_ROOT + '/stdout.pdf'
+    
+    if not os.path.islink(output_file):
+        os.symlink("/dev/stdout", output_file)
+    
+    # construct parameters to our phantom instance
     args = [settings.APP_ROOT + "/bin/phantomjs",
             os.path.dirname(__file__)+"/html2pdf.js",
-            url, output_file]
+            output_file]
     
-    #print args
-
-    contents = subprocess.check_output(args)
+    # create the process
+    p = Popen(args, stdin=PIPE, stdout=PIPE)
     
+    # send the html to stdin and read the stdout
+    print response.content.encode("UTF-8")
+    contents = p.communicate(input = response.content.encode("UTF-8"))[0]
+    
+    # return contents to browser with appropiate mimetype
     response = http.HttpResponse(contents, mimetype='application/pdf')
-    response['Content-Disposition'] = 'filename=%s.pdf' % 'output'
+    response['Content-Disposition'] = 'filename=%s.pdf' % name
     return response
     
 
@@ -46,9 +58,6 @@ class PdfMiddleware(object):
     def process_response(self, request, response):
         format = request.GET.get(REQUEST_FORMAT_NAME, None)
         if format == REQUEST_FORMAT_PDF_VALUE:
-            path = 'http://'
-            if request.is_secure():
-                path = 'https://'
-            path = path + request.get_host() + request.path
-            response = transform_to_pdf(response, path)
+            path = request.path
+            response = transform_to_pdf(response, path[path.rfind('/')+1:])
         return response
