@@ -36,13 +36,13 @@ def transform_to_pdf(response, name):
     # construct parameters to our phantom instance
     args = [settings.APP_ROOT + "/bin/phantomjs",
             os.path.dirname(__file__)+"/html2pdf.js",
+            "/dev/stdin",
             output_file]
     
     # create the process
     p = Popen(args, stdin=PIPE, stdout=PIPE)
     
     # send the html to stdin and read the stdout
-    print response.content.encode("UTF-8")
     contents = p.communicate(input = response.content.encode("UTF-8"))[0]
     
     # return contents to browser with appropiate mimetype
