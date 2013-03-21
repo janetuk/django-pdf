@@ -12,7 +12,7 @@ var system  = require("system");
 page.paperSize = {
   format: "Letter",
   orientation: "portrait",
-  margin: {left:"2.5cm", right:"2.5cm", top:"1cm", bottom:"1cm"},
+  margin: {left:"0cm", right:"0cm", top:"0cm", bottom:"0cm"},
   footer: {
     height: "0.9cm",
     contents: phantom.callback(function(pageNum, numPages) {
