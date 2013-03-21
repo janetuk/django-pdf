@@ -11,7 +11,6 @@ setup(
     maintainer_email="chris.p.bailey@gmail.com",
     license="GPL 2.0",
     url='https://github.com/chrispbailey/django-pdf/',
-    install_requires=['xhtml2pdf',],
     packages=['django_pdf',],
     package_data={
         'django_pdf': ['templatetags/*',],
