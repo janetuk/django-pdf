@@ -26,15 +26,20 @@ def fetch_resources(uri, rel):
     return path
 
 
-def transform_to_pdf(response, name):
+def transform_to_pdf(response, host, name):
     """
     This function writes the html to a temp file and passes it to PhantomJS
     which renders it to a temp PDF file, the contents of which are rendered 
     back to the client
     """
     # create a temp file to write our HTML to
-    input_file = tempfile.NamedTemporaryFile(delete=True)
-    input_file.write(response.content.encode("UTF-8"))
+    input_file = tempfile.NamedTemporaryFile(delete=False)
+    
+    # insert base so that static resources are loaded correctly
+    content = response.content.encode("UTF-8")
+    content = content.replace('<head>','<head><base href="%s">' % host)
+    
+    input_file.write(content)
     
     # construct parameters to our phantom instance
     args = [settings.APP_ROOT + "/bin/phantomjs",
@@ -46,10 +51,10 @@ def transform_to_pdf(response, name):
     p = call(args)
     
     # read the generated pdf output
-    output_file = open(input_file.name+'.pdf','r')
-
+    output_file = open(input_file.name+'.pdf','rb')
+    
     contents = output_file.read()
-
+    
     # delete the files
     input_file.close()
     output_file.close()
@@ -71,5 +76,5 @@ class PdfMiddleware(object):
             path = request.path
             if path.endswith('/'):
                 path = path[:-1]
-            response = transform_to_pdf(response, path[path.rfind('/')+1:])
+            response = transform_to_pdf(response, request.build_absolute_uri('/'), path[path.rfind('/')+1:])
         return response
