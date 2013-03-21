@@ -1,19 +1,20 @@
 What is this?
 -------------
 
-``django-pdf`` despite its simplicity has the pompous mission of automagically
-converting on-the-fly views' HTML output to PDF --without modifying your views.
+A lightweight django middleware app to convert the HTML output of a view to PDF. 
+Originally forked from https://github.com/directeur/django-pdf
+This latest version uses PhantomJS to generate PDFs (rather then xhtml2pdf)
 
 Installation
 ------------
 
-There are 5 steps to setting it up with your projects.
+1. Install PhantomJS. See http://phantomjs.org/
 
-1. Install egg (via pip http://www.pip-installer.org/)
+2. Install egg (via pip http://www.pip-installer.org/)
 
        pip install -e git+https://github.com/chrispbailey/django-pdf#egg=django-pdf
 
-2. List this application in the ``INSTALLED_APPS`` portion of your settings
+3. List this application in the ``INSTALLED_APPS`` portion of your settings
    file.  Your settings file might look something like::
    
        INSTALLED_APPS = (
@@ -21,7 +22,7 @@ There are 5 steps to setting it up with your projects.
            'django_pdf',
        )
 
-3. Install the pdf middleware. Your settings file might look something
+4. Install the pdf middleware. Your settings file might look something
    like::
    
        MIDDLEWARE_CLASSES = (
@@ -29,7 +30,7 @@ There are 5 steps to setting it up with your projects.
            'django_pdf.middleware.PdfMiddleware',
        )
 
-4. If it's not already added in your setup, add the request context processor.
+5. If it's not already added in your setup, add the request context processor.
    Note that context processors are set by default implicitly, so to set them
    explicitly, you need to copy and paste this code into your under
    the value TEMPLATE_CONTEXT_PROCESSORS::
@@ -40,7 +41,7 @@ There are 5 steps to setting it up with your projects.
         "django.core.context_processors.media",
         "django.core.context_processors.request")
 
-5. Add the django_pdf's context processor
+6. Add the django_pdf's context processor
 
     TEMPLATE_CONTEXT_PROCESSORS=(
         "django.core.context_processors.auth",
@@ -50,6 +51,12 @@ There are 5 steps to setting it up with your projects.
         "django.core.context_processors.request",
         "django_pdf.context_processors.check_format", #<-- this line
     )
+
+7. In your settings.py file, specify the path to the PhantomJS binary
+
+    # Location of phantomjs executable
+    PHANTOMJS_EXECUTABLE = "/path/to/phantomjs"
+
 
 That's it, now all it takes to generate a PDF version of your page is to add:
 ?format=pdf to your urls
