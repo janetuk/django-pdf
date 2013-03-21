@@ -1,30 +1,17 @@
 #!/usr/bin/env python
 
-import os.path
-from django import http
-from django.http import HttpResponse
-from django.conf import settings
-
-from StringIO import StringIO
-from subprocess import Popen, call, PIPE
 import os
 import tempfile
+
+from subprocess import call
+
+from django.http import HttpResponse
+from django.conf import settings
 
 REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
 REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
 TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK', 'DJANGO_PDF_OUTPUT')
-
-def fetch_resources(uri, rel):
-    """
-    Prepares paths for pisa
-    """
-    if uri.startswith('http'):
-        return uri
-
-    path = os.path.join(settings.STATIC_ROOT,
-            uri.replace(settings.STATIC_URL, ""))
-    return path
-
+PHANTOMJS_EXECUTABLE = getattr(settings, 'PHANTOMJS_EXECUTABLE', 'phantomjs')
 
 def transform_to_pdf(response, host, name):
     """
@@ -42,7 +29,7 @@ def transform_to_pdf(response, host, name):
     input_file.write(content)
     
     # construct parameters to our phantom instance
-    args = [settings.APP_ROOT + "/bin/phantomjs",
+    args = [PHANTOMJS_EXECUTABLE,
             os.path.dirname(__file__)+"/html2pdf.js",
             input_file.name,
             input_file.name+'.pdf']
@@ -61,7 +48,7 @@ def transform_to_pdf(response, host, name):
     os.remove(output_file.name)
     
     # return contents to browser with appropriate mimetype
-    response = http.HttpResponse(contents, content_type='application/pdf')
+    response = HttpResponse(contents, content_type='application/pdf')
     response['Content-Disposition'] = 'filename=%s.pdf' % name
     return response
     
