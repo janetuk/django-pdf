@@ -6,8 +6,9 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from StringIO import StringIO
-from subprocess import Popen, PIPE
+from subprocess import Popen, call, PIPE
 import os
+import tempfile
 
 REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
 REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
@@ -26,27 +27,36 @@ def fetch_resources(uri, rel):
 
 
 def transform_to_pdf(response, name):
-    
-    # trick phantom into sending the pdf to STDOUT
-    output_file = settings.APP_ROOT + '/stdout.pdf'
-    
-    if not os.path.islink(output_file):
-        os.symlink("/dev/stdout", output_file)
+    """
+    This function writes the html to a temp file and passes it to PhantomJS
+    which renders it to a temp PDF file, the contents of which are rendered 
+    back to the client
+    """
+    # create a temp file to write our HTML to
+    input_file = tempfile.NamedTemporaryFile(delete=True)
+    input_file.write(response.content.encode("UTF-8"))
     
     # construct parameters to our phantom instance
     args = [settings.APP_ROOT + "/bin/phantomjs",
             os.path.dirname(__file__)+"/html2pdf.js",
-            "/dev/stdin",
-            output_file]
+            input_file.name,
+            input_file.name+'.pdf']
     
     # create the process
-    p = Popen(args, stdin=PIPE, stdout=PIPE)
+    p = call(args)
     
-    # send the html to stdin and read the stdout
-    contents = p.communicate(input = response.content.encode("UTF-8"))[0]
+    # read the generated pdf output
+    output_file = open(input_file.name+'.pdf','r')
+
+    contents = output_file.read()
+
+    # delete the files
+    input_file.close()
+    output_file.close()
+    os.remove(output_file.name)
     
-    # return contents to browser with appropiate mimetype
-    response = http.HttpResponse(contents, mimetype='application/pdf')
+    # return contents to browser with appropriate mimetype
+    response = http.HttpResponse(contents, content_type='application/pdf')
     response['Content-Disposition'] = 'filename=%s.pdf' % name
     return response
     
@@ -59,5 +69,7 @@ class PdfMiddleware(object):
         format = request.GET.get(REQUEST_FORMAT_NAME, None)
         if format == REQUEST_FORMAT_PDF_VALUE:
             path = request.path
+            if path.endswith('/'):
+                path = path[:-1]
             response = transform_to_pdf(response, path[path.rfind('/')+1:])
         return response

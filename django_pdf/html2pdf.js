@@ -24,14 +24,14 @@ page.paperSize = {
 
 page.zoomFactor = 1.5;
 
-// read contents of page from STDIN
+// read contents of page from file
 var html = fs.read(system.args[1]);
 
 page.content = html;
 
 // wait until the content has loaded
 page.onLoadFinished = function(status) {
-    // save output
+    // save output file
     page.render(system.args[2]);
     phantom.exit();
 };
