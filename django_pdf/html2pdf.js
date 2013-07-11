@@ -12,7 +12,7 @@ var system  = require("system");
 page.paperSize = {
   format: "Letter",
   orientation: "portrait",
-  margin: {left:"0cm", right:"0cm", top:"0cm", bottom:"0cm"},
+  margin: {left:"0.5cm", right:"0.5cm", top:"1cm", bottom:"1cm"},
   footer: {
     height: "0.9cm",
     contents: phantom.callback(function(pageNum, numPages) {
@@ -22,7 +22,7 @@ page.paperSize = {
   }
 };
 
-page.zoomFactor = 1.5;
+page.zoomFactor = 1.0;
 
 // read contents of page from file
 var html = fs.read(system.args[1]);
