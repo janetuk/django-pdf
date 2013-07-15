@@ -1,3 +1,5 @@
+from urlparse import urlparse
+
 from django import template
 from django.http import Http404
 from django.conf import settings
@@ -24,3 +26,17 @@ def pdf_url(context):
         urlappend = '%s=%s' % (REQUEST_FORMAT_NAME, REQUEST_FORMAT_PDF_VALUE)
 
     return '%s?%s' % (request.path, urlappend)
+
+
+@register.simple_tag
+def pdf_url_append(url):
+    """
+    Returns passed url with pdf parameters appended
+    """
+    url_parts = urlparse(url)
+    url_append = '%s=%s' % (REQUEST_FORMAT_NAME, REQUEST_FORMAT_PDF_VALUE)
+
+    if url_parts.query:
+        url_append = '&' + url_append
+
+    return '%s?%s%s' % (url_parts.path, url_parts.query, url_append)
