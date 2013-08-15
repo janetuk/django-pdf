@@ -13,7 +13,7 @@ REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
 TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK', 'DJANGO_PDF_OUTPUT')
 PHANTOMJS_EXECUTABLE = getattr(settings, 'PHANTOMJS_EXECUTABLE', 'phantomjs')
 
-def transform_to_pdf(response, host, name):
+def transform_to_pdf(response, host='', filename='page.pdf'):
     """
     This function writes the html to a temp file and passes it to PhantomJS
     which renders it to a temp PDF file, the contents of which are rendered 
@@ -27,6 +27,7 @@ def transform_to_pdf(response, host, name):
     content = content.replace('<head>','<head><base href="%s">' % host)
     
     input_file.write(content)
+    input_file.close()
     
     # construct parameters to our phantom instance
     args = [PHANTOMJS_EXECUTABLE,
@@ -43,13 +44,18 @@ def transform_to_pdf(response, host, name):
     contents = output_file.read()
     
     # delete the files
-    input_file.close()
     output_file.close()
+    os.remove(input_file.name)
     os.remove(output_file.name)
     
     # return contents to browser with appropriate mimetype
     response = HttpResponse(contents, content_type='application/pdf')
-    response['Content-Disposition'] = 'filename=%s.pdf' % name
+    
+    # Add extension if missing
+    if not filename.endswith('.pdf'):
+        filename = "%s.pdf" % filename
+    
+    response['Content-Disposition'] = 'filename=%s' % filename
     return response
     
 
