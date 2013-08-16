@@ -13,4 +13,5 @@ INSTALLED_APPS = (
     'django_pdf',
 )
 
-PHANTOMJS_EXECUTABLE = '[path_to_phantom_js]'
+# Change the following as necessary
+PHANTOMJS_EXECUTABLE = 'phantomjs'
