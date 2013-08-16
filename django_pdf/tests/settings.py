@@ -13,5 +13,7 @@ INSTALLED_APPS = (
     'django_pdf',
 )
 
+SECRET_KEY = 'abc123'
+
 # Change the following as necessary
 PHANTOMJS_EXECUTABLE = 'phantomjs'
