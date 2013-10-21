@@ -1,12 +1,14 @@
 language: python
 python:
   - "2.7"
+before_install:
+ - apt-get install ttf-linux-libertine ttf-droid xfonts-wqy ttf-freefont
 install:
  - pip install slate
  - pip install pdfminer
  - pip install -q Django --use-mirrors
  - pip install -q -e . --use-mirrors
-before_install:
+before_script:
  - cp django_pdf/tests/settings.py .
 script:
  - django-admin.py test django_pdf --settings=settings
