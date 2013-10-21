@@ -1,3 +1,4 @@
+# encoding: utf-8
 import slate
 import StringIO
 import tempfile
@@ -49,6 +50,40 @@ class TestPDFGeneration(TestCase):
         response = transform_to_pdf(self.response)
         temp_files_after = len(listdir(tempfile.gettempdir()))
         assert temp_files_before == temp_files_after
+
+    def test_character_encodings(self):
+        """ 
+        Tests that the pdf generation can support various character sets for 
+        different alphabets
+        """
+        html = u"""<html>
+                <body>
+                <p>Can the pdf generate these?</p>
+                    ISO 8859-5 - чуоюющяа (Cyrillic ru)
+                    ISO 8859-6 - ﻗﻠﯿﻼ (Arabic ar)
+                    ISO 8859-7 - ΔΦψ (Greek el)
+                    ISO 8859-8 - úŵËÕŷîâöòÆṫ (Hebrew he)
+                    ISO 8859-14 - Ṫêċï (Welsh and Gaelic gd/ga)
+                    ISO 639 - 電电 (Chinese simplified & traditional zh)
+                    ISO-2022-JP - ゴシック (Japanese ja)
+                </body>
+                </html>"""
+        
+        response = HttpResponse(html)
+        response = transform_to_pdf(response)
+        
+        # Check the generated pdf contains our contents
+        pdf_content = get_content_from_pdf(response.content)
+        
+        assert u'чуоюющяа' in pdf_content
+        assert u'ﻗﻠﯿﻼ' in pdf_content
+        assert u'ΔΦψ' in pdf_content
+        assert u'úŵËÕŷîâöòÆṫ' in pdf_content
+        assert u'Ṫêċï' in pdf_content
+        assert u'電电' in pdf_content
+        assert u'ゴシック' in pdf_content
+        
+        assert u'\x00' not in pdf_content
 
 
 def get_content_from_pdf(content):
