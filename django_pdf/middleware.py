@@ -24,7 +24,9 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
     
     # insert base so that static resources are loaded correctly
     content = response.content.decode("UTF-8").encode("UTF-8")
-    content = content.replace('<head>','<head><base href="%s">' % host)
+    
+    if host != 'http://testserver/':
+        content = content.replace('<head>','<head><base href="%s">' % host)
     
     input_file.write(content)
     input_file.close()
