@@ -5,7 +5,7 @@ before_install:
  - sudo apt-get install -qq ttf-linux-libertine ttf-droid xfonts-wqy ttf-freefont 
 install:
  - pip install slate
- - pip install pdfminer
+ - pip install --pre pdfminer
  - pip install -q Django --use-mirrors
  - pip install -q -e . --use-mirrors
 before_script:
