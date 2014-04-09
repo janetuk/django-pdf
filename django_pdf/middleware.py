@@ -13,6 +13,7 @@ REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
 TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK', 'DJANGO_PDF_OUTPUT')
 PHANTOMJS_EXECUTABLE = getattr(settings, 'PHANTOMJS_EXECUTABLE', 'phantomjs')
 
+
 def transform_to_pdf(response, host='', filename='page.pdf'):
     """
     This function writes the html to a temp file and passes it to PhantomJS
@@ -21,45 +22,57 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
     """
     # create a temp file to write our HTML to
     input_file = tempfile.NamedTemporaryFile(delete=False)
-    
+
     # insert base so that static resources are loaded correctly
     content = response.content.decode("UTF-8").encode("UTF-8")
-    
+
     if host != 'http://testserver/':
         content = content.replace('<head>','<head><base href="%s">' % host)
-    
+
     input_file.write(content)
     input_file.close()
-    
+
     # construct parameters to our phantom instance
     args = [PHANTOMJS_EXECUTABLE,
             os.path.dirname(__file__)+"/html2pdf.js",
             input_file.name,
             input_file.name+'.pdf']
-    
+
     # create the process
     p = call(args)
-    
+
     # read the generated pdf output
     output_file = open(input_file.name+'.pdf','rb')
-    
+
     contents = output_file.read()
-    
+
     # delete the files
     output_file.close()
     os.remove(input_file.name)
     os.remove(output_file.name)
-    
+
     # return contents to browser with appropriate mimetype
     response = HttpResponse(contents, content_type='application/pdf')
-    
+
     # Add extension if missing
     if not filename.endswith('.pdf'):
         filename = "%s.pdf" % filename
-    
+
     response['Content-Disposition'] = 'filename=%s' % filename
     return response
-    
+
+def get_filename(path):
+    """
+    Returns a string representation of the url path to be used as a filename
+    """
+    if path.find('?') > 0:
+        path = path[:path.find('?')]
+    if path.endswith('/'):
+        path = path[:-1]
+    filename = path[path.rfind('/')+1:]
+    if not filename:
+        filename = 'page'
+    return filename+'.pdf'
 
 class PdfMiddleware(object):
     """
@@ -68,8 +81,9 @@ class PdfMiddleware(object):
     def process_response(self, request, response):
         format = request.GET.get(REQUEST_FORMAT_NAME, None)
         if format == REQUEST_FORMAT_PDF_VALUE:
-            path = request.path
-            if path.endswith('/'):
-                path = path[:-1]
-            response = transform_to_pdf(response, request.build_absolute_uri('/'), path[path.rfind('/')+1:])
+            filename = get_filename(request.path)
+            response = transform_to_pdf(response,
+                                        request.build_absolute_uri('/'),
+                                        filename)
         return response
+
