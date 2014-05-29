@@ -21,7 +21,7 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
     back to the client
     """
     # create a temp file to write our HTML to
-    input_file = tempfile.NamedTemporaryFile(delete=False)
+    input_file = tempfile.NamedTemporaryFile(prefix='django_pdf_', delete=False)
 
     # insert base so that static resources are loaded correctly
     content = response.content.decode("UTF-8").encode("UTF-8")
