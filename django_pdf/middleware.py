@@ -22,8 +22,12 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
     """
     # create a temp file to write our HTML to
     input_file = tempfile.NamedTemporaryFile(prefix='django_pdf_', delete=False)
-
-    # insert base so that static resources are loaded correctly
+    # And one to store the pdf output in
+    output_file = tempfile.NamedTemporaryFile(prefix='django_pdf_',
+                                              suffix='.pdf',
+                                              delete=False)
+    
+    # insert <base> tag so that static resources are loaded correctly
     content = response.content.decode("UTF-8").encode("UTF-8")
 
     if host != 'http://testserver/':
@@ -36,14 +40,12 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
     args = [PHANTOMJS_EXECUTABLE,
             os.path.dirname(__file__)+"/html2pdf.js",
             input_file.name,
-            input_file.name+'.pdf']
+            output_file.name]
 
     # create the process
     p = call(args)
 
     # read the generated pdf output
-    output_file = open(input_file.name+'.pdf','rb')
-
     contents = output_file.read()
 
     # delete the files
