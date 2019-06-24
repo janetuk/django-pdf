@@ -1,4 +1,4 @@
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from django import template
 from django.http import Http404
@@ -20,7 +20,7 @@ def pdf_url(context):
     getvars = request.GET.copy()
     getvars[REQUEST_FORMAT_NAME] = REQUEST_FORMAT_PDF_VALUE
 
-    if len(getvars.keys()) > 1:
+    if len(list(getvars.keys())) > 1:
         urlappend = "&%s" % getvars.urlencode()
     else:
         urlappend = '%s=%s' % (REQUEST_FORMAT_NAME, REQUEST_FORMAT_PDF_VALUE)

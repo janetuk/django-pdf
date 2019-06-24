@@ -7,6 +7,7 @@ from subprocess import call
 
 from django.http import HttpResponse
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
 REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
@@ -76,7 +77,7 @@ def get_filename(path):
         filename = 'page'
     return filename+'.pdf'
 
-class PdfMiddleware(object):
+class PdfMiddleware(MiddlewareMixin):
     """
     Converts the response to a pdf one.
     """

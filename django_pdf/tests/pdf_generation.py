@@ -1,6 +1,6 @@
 # encoding: utf-8
 import slate
-import StringIO
+import io
 import tempfile
 from os import listdir
 
@@ -57,7 +57,7 @@ class TestPDFGeneration(TestCase):
         Tests that the pdf generation can support various character sets for 
         different alphabets
         """
-        html = u"""<html>
+        html = """<html>
                 <body>
                 <p>Can the pdf generate these?</p>
                     ISO 8859-5 - чуоюющяа (Cyrillic ru)
@@ -76,15 +76,15 @@ class TestPDFGeneration(TestCase):
         # Check the generated pdf contains our contents
         pdf_content = get_content_from_pdf(response.content)
 
-        assert u'чуоюющяа' in pdf_content
-        assert u'ﻗﻠﯿﻼ' in pdf_content
-        assert u'ΔΦψ' in pdf_content
-        assert u'úŵËÕŷîâöòÆṫ' in pdf_content
-        assert u'Ṫêċï' in pdf_content
-        assert u'電电' in pdf_content
-        assert u'ゴシック' in pdf_content
+        assert 'чуоюющяа' in pdf_content
+        assert 'ﻗﻠﯿﻼ' in pdf_content
+        assert 'ΔΦψ' in pdf_content
+        assert 'úŵËÕŷîâöòÆṫ' in pdf_content
+        assert 'Ṫêċï' in pdf_content
+        assert '電电' in pdf_content
+        assert 'ゴシック' in pdf_content
 
-        assert u'\x00' not in pdf_content
+        assert '\x00' not in pdf_content
 
     def test_get_filename_method(self):
         assert get_filename('') == 'page.pdf'
@@ -100,7 +100,7 @@ def get_content_from_pdf(content):
     Helper function to extract text from pdf using the slate library
     """
 
-    output = StringIO.StringIO()
+    output = io.StringIO()
     output.write(content)
 
     doc = ''
