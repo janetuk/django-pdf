@@ -29,12 +29,12 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
                                               delete=False)
     
     # insert <base> tag so that static resources are loaded correctly
-    content = response.content.decode("UTF-8").encode("UTF-8")
+    content = response.content.decode("UTF-8")
 
     if host != 'http://testserver/':
-        content = content.replace('<head>','<head><base href="%s">' % host)
+        content = content.replace('<head>','<head><base href="{}">'.format(host))
 
-    input_file.write(content)
+    input_file.write(content.encode("UTF-8"))
     input_file.close()
 
     # construct parameters to our phantom instance
