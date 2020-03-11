@@ -5,14 +5,9 @@ import tempfile
 
 from subprocess import call
 
-from django.http import HttpResponse
 from django.conf import settings
 
-REQUEST_FORMAT_NAME = getattr(settings, 'REQUEST_FORMAT_NAME', 'format')
-REQUEST_FORMAT_PDF_VALUE = getattr(settings, 'REQUEST_FORMAT_PDF_VALUE', 'pdf')
-TEMPLATE_PDF_CHECK = getattr(settings, 'TEMPLATE_PDF_CHECK', 'DJANGO_PDF_OUTPUT')
-PHANTOMJS_EXECUTABLE = getattr(settings, 'PHANTOMJS_EXECUTABLE', 'phantomjs')
-
+from django.http import HttpResponse
 
 def transform_to_pdf(response, host='', filename='page.pdf'):
     """
@@ -37,7 +32,7 @@ def transform_to_pdf(response, host='', filename='page.pdf'):
     input_file.close()
 
     # construct parameters to our phantom instance
-    args = [PHANTOMJS_EXECUTABLE,
+    args = [settings.PHANTOMJS_EXECUTABLE,
             os.path.dirname(__file__)+"/html2pdf.js",
             input_file.name,
             output_file.name]
@@ -80,12 +75,17 @@ class PdfMiddleware(object):
     """
     Converts the response to a pdf one.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
     def process_response(self, request, response):
-        format = request.GET.get(REQUEST_FORMAT_NAME, None)
-        if format == REQUEST_FORMAT_PDF_VALUE:
+        format = request.GET.get(settings.REQUEST_FORMAT_NAME, None)
+        if format == settings.REQUEST_FORMAT_PDF_VALUE:
             filename = get_filename(request.path)
             response = transform_to_pdf(response,
                                         request.build_absolute_uri('/'),
                                         filename)
         return response
-
