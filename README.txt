@@ -1,6 +1,7 @@
 What is this?
 -------------
 
+
 A lightweight django middleware app to convert the HTML output of a view to PDF. 
 Originally forked from https://github.com/directeur/django-pdf
 This latest version uses PhantomJS to generate PDFs (rather then xhtml2pdf)
